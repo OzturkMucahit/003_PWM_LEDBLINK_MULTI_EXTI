@@ -43,6 +43,8 @@ TIM_HandleTypeDef htim4;
 
 /* USER CODE BEGIN PV */
 
+int i, itr_button;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -89,6 +91,11 @@ int main(void)
   MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
 
+  HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_1);
+  HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_2);
+  HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_3);
+  HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -98,6 +105,67 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+
+	  /****** Led blinking with CAPTURE COMPARE REGISTER (CCR) 	******/
+
+	  /** ARR:499 , PSC:19 Values are changed for set the blinking value with HAL delay function. **/
+
+/*
+	  for (i=0; i<=419; i++)
+	  {
+		  TIM4 ->CCR1 = i;
+		  TIM4 ->CCR2 = i;
+		  TIM4 ->CCR3 = i;
+		  TIM4 ->CCR4 = i;
+		  HAL_Delay(3);
+	  }
+*/
+/*
+	  for (i=0; i<=419; i++)
+	  {
+		  __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, i);
+		  __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, i);
+		  __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_3, i);
+		  __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_4, i);
+		  HAL_Delay(3);
+	  }
+*/
+
+	  switch (itr_button){
+	  	case 1:							// First scenario
+	  		for (i=0; i<=419; i++)
+	  		{
+  			  TIM4 ->CCR1 = 419-i;
+  			  TIM4 ->CCR2 = 319-i;
+	  		  TIM4 ->CCR3 = 219-i;
+	  		  TIM4 ->CCR4 = 119-i;
+	  		  HAL_Delay(2);
+	  		  }
+	  	break;
+
+	  	case 2:							// Second scenario
+	  		for (i=0; i<=419; i++)
+	  		{
+	  			 TIM4 -> CCR1 = i;
+	  			 TIM4 -> CCR2 = i;
+	  			 TIM4 -> CCR3 = 419-i;
+	  			 TIM4 -> CCR4 = 419-i;
+	  			 HAL_Delay(2);
+	  		}
+	  	break;
+
+	  	default:						// Default scenario
+		  for (i=0; i<=419; i++)
+		  {
+			  TIM4 ->CCR1 = i;
+			  TIM4 ->CCR2 = i;
+			  TIM4 ->CCR3 = i;
+			  TIM4 ->CCR4 = i;
+			  HAL_Delay(2);
+		  }
+	  }
+
+
   }
   /* USER CODE END 3 */
 }
@@ -169,7 +237,7 @@ static void MX_TIM4_Init(void)
   htim4.Instance = TIM4;
   htim4.Init.Prescaler = 19;
   htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim4.Init.Period = 4199;
+  htim4.Init.Period = 419;
   htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim4) != HAL_OK)
@@ -232,10 +300,16 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
 
-  /*Configure GPIO pins : PA0 PA1 */
-  GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_1;
+  /*Configure GPIO pin : PA0 */
+  GPIO_InitStruct.Pin = GPIO_PIN_0;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : PA1 */
+  GPIO_InitStruct.Pin = GPIO_PIN_1;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
